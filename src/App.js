@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import axios from "axios";
+import ReactHtmlParser, { processNodes, convertNodeToElement, htmlparser2 } from 'react-html-parser';
 
 // import SearchInput from './components/SearchInput'
 import './App.css';
@@ -48,24 +49,37 @@ class App extends Component {
   handleChecked(event) {
     switch (event.target.name) {
       case 'series':
-      this.setState({seriesChecked: !this.state.seriesChecked});
-      break;
+        this.setState({ seriesChecked: !this.state.seriesChecked });
+        break;
       case 'author':
-      this.setState({authorChecked: !this.state.authorChecked});
-      break;
+        this.setState({ authorChecked: !this.state.authorChecked });
+        break;
       case 'book':
-      this.setState({bookChecked: !this.state.bookChecked});
-      break;
+        this.setState({ bookChecked: !this.state.bookChecked });
+        break;
       case 'genre':
-      this.setState({genreChecked: !this.state.genreChecked});
-      break;
+        this.setState({ genreChecked: !this.state.genreChecked });
+        break;
     }
   }
 
 
   handleSearch() {
     // this.setState({ search: this.state.value });
+    // &chs=on
     let preQuerie = this.state.querie.replace(/ /g, "+");
+    if (this.state.seriesChecked) {
+      preQuerie = preQuerie + '&chs=on'
+    }
+    if (this.state.authorChecked) {
+      preQuerie = preQuerie + '&cha=on'
+    }
+    if (this.state.bookChecked) {
+      preQuerie = preQuerie + '&chb=on'
+    }
+    if (this.state.genreChecked) {
+      preQuerie = preQuerie + '&chg=on'
+    }
     const searchQuerie = 'https://flibustasearch.herokuapp.com/http://flibusta.is/booksearch?ask=' + preQuerie;
     axios.get(searchQuerie).then(response => { this.setState({ result: response.data }, () => this.refineResult()) })
   }
@@ -76,7 +90,32 @@ class App extends Component {
     const result2 = result1.substring(0, result1.indexOf('<div id="sidebar-right" class="sidebar">'));
     const array1 = result2.split('\n');
     const array2 = array1.filter(String);
-    this.setState({ result2: array2 });
+    const array3 = array2.filter(elem => {
+      if (elem.includes('h1 class="title"')) { return false };
+      if (elem.includes('input type=submit value')) { return false };
+      if (elem.includes('<input type="checkbox"')) { return false };
+      if (elem.includes('<a href="http://fbsearch.ru">')) { return false };
+      // if (elem.includes('</form><hr><br><div class="item-list"><ul class="pager">')) { return false };
+      return true;
+    });
+
+    const array5 = array3.map((elem, index) => {
+
+      if (elem.includes('<li class="pager-current first">')) {
+        elem = elem.substr(35)
+      };
+
+      if (elem.includes('<li class="pager-')) {
+        elem = ReactHtmlParser(elem)
+      };
+
+      return (
+        elem
+      )
+    })
+
+    // let doc = new DOMParser().parseFromString('<div><b>Hello!</b></div>', 'text/html');
+    this.setState({ result2: array5 });
   }
 
   render() {
@@ -89,16 +128,16 @@ class App extends Component {
           placeholder='Enter book name' /> */}
         <button onClick={this.handleSearch}>Search</button>
         <div>
-          <input type="checkbox"  name="series" value="newsletter" onChange={this.handleChecked} checked={this.state.seriesChecked}/><label>Серии</label>
+          <input type="checkbox" name="series" value="newsletter" onChange={this.handleChecked} checked={this.state.seriesChecked} /><label>Серии</label>
         </div>
         <div>
-          <input type="checkbox"  name="author" value="newsletter" onChange={this.handleChecked} checked={this.state.authorChecked}/><label>Авторы</label>
+          <input type="checkbox" name="author" value="newsletter" onChange={this.handleChecked} checked={this.state.authorChecked} /><label>Авторы</label>
         </div>
         <div>
-          <input type="checkbox"  name="book" value="newsletter" onChange={this.handleChecked} checked={this.state.bookChecked}/><label>Книги</label>
+          <input type="checkbox" name="book" value="newsletter" onChange={this.handleChecked} checked={this.state.bookChecked} /><label>Книги</label>
         </div>
         <div>
-          <input type="checkbox" name="genre" value="newsletter" onChange={this.handleChecked} checked={this.state.genreChecked}/><label>Жанры</label>
+          <input type="checkbox" name="genre" value="newsletter" onChange={this.handleChecked} checked={this.state.genreChecked} /><label>Жанры</label>
         </div>
         <div>
           {this.state.result2.map((result, index) => {
