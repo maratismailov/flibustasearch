@@ -101,14 +101,14 @@ class App extends Component {
 
     const array5 = array3.map((elem, index) => {
 
-      if (elem.includes('<li class="pager-current first">')) {
-        elem = elem.substr(35)
-      };
+      // if (elem.includes('<li class="pager-current first">')) {
+      //   elem = elem.substr(35)
+      // };
 
-      if (elem.includes('<li class="pager-')) {
-        elem = ReactHtmlParser(elem)
-      };
-
+      // if (elem.includes('<li class="pager-')) {
+      //   elem = ReactHtmlParser(elem)
+      // };
+      elem = ReactHtmlParser(elem)
       return (
         elem
       )
