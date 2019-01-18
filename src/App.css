@@ -1,12 +1,29 @@
 .App {
   /* text-align: center; */
   margin: 3%;
-  color: aquamarine
+  color: #b1c1d1
 }
+.Pages {
+  display: flex;
+}
+
+.Button {
+  height: 50%;
+  margin: 1%;
+}
+/* .pager {
+  text-align: center;
+  margin: 0%;
+  padding-inline-start: 5px;
+} */
 
 .App-logo {
   animation: App-logo-spin infinite 20s linear;
   height: 40vmin;
+}
+.body {
+  margin: 3%;
+  color: #b1c1d1
 }
 
 .App-header {

@@ -32,14 +32,18 @@ class App extends Component {
       search: '',
       result: '',
       result2: [],
+      buttons: [],
       seriesChecked: true,
       authorChecked: true,
       bookChecked: true,
-      genreChecked: true
+      genreChecked: true,
+      pageNumber: 0,
+      pagesTotal: 0
     };
     this.handleChange = this.handleChange.bind(this);
     this.handleSearch = this.handleSearch.bind(this);
     this.handleChecked = this.handleChecked.bind(this);
+    // this.changePageNumber = this.changePageNumber.bind(this)
   }
 
   handleChange(event) {
@@ -63,6 +67,14 @@ class App extends Component {
     }
   }
 
+  changePageNumber(arg) {
+    if(arg === 1) {
+      this.setState({ pageNumber: this.state.pageNumber - 1 })
+    }
+    if(arg === 2) {
+      this.setState({ pageNumber: this.state.pageNumber + 1 })
+    }
+  }
 
   handleSearch() {
     // this.setState({ search: this.state.value });
@@ -77,10 +89,10 @@ class App extends Component {
     if (this.state.bookChecked) {
       preQuerie = preQuerie + '&chb=on'
     }
-    if (this.state.genreChecked) {
-      preQuerie = preQuerie + '&chg=on'
-    }
-    const searchQuerie = 'https://flibustasearch.herokuapp.com/http://flibusta.is/booksearch?ask=' + preQuerie;
+    // if (this.state.genreChecked) {
+    //   preQuerie = preQuerie + '&chg=on'
+    // }
+    const searchQuerie = 'https://flibustasearch.herokuapp.com/http://flibusta.is/booksearch?page='+this.state.pageNumber+'&ask=' + preQuerie;
     axios.get(searchQuerie).then(response => { this.setState({ result: response.data }, () => this.refineResult()) })
   }
 
@@ -90,20 +102,52 @@ class App extends Component {
     const result2 = result1.substring(0, result1.indexOf('<div id="sidebar-right" class="sidebar">'));
     const array1 = result2.split('\n');
     const array2 = array1.filter(String);
+    const pagesTotal = array2.filter(elem => {
+      if (elem.includes('h1 class="title"')) { 
+        return true;
+      }; 
+    });
+    
+    // const preButtonArray = array2.map(elem => {
+    //   if (elem.includes('class="pager') && !elem.includes('<div class="item-list"><ul class="pager">')) {
+    //     return elem
+    //   };
+    // //   if (elem.includes('<div class="item-list"><ul class="pager">')) {
+    //     return elem = elem.substr(elem.indexOf('er">') + 4)
+    //     // console.log('found!')
+    //   };
+    // })
+    // const preButtonArray2 = preButtonArray.filter((elem, index )=> {
+    //   if ((elem !== null) && (index < preButtonArray.length/2)){
+    //     return elem;
+    //   }
+    // })
+    // const preButtonArray3 = preButtonArray2.map(elem => {
+
+    //   return elem
+    // });
+    // const buttonArray = preButtonArray3.map(elem => {
+    //   elem = ReactHtmlParser(elem);
+    //   return elem;
+    // })
+
     const array3 = array2.filter(elem => {
       if (elem.includes('h1 class="title"')) { return false };
       if (elem.includes('input type=submit value')) { return false };
       if (elem.includes('<input type="checkbox"')) { return false };
       if (elem.includes('<a href="http://fbsearch.ru">')) { return false };
+      if (elem.includes('class="pager')) { return false };
       // if (elem.includes('</form><hr><br><div class="item-list"><ul class="pager">')) { return false };
       return true;
     });
+    // const array6 = array3.map
 
     const array5 = array3.map((elem, index) => {
 
-      // if (elem.includes('<li class="pager-current first">')) {
-      //   elem = elem.substr(35)
-      // };
+      if (elem.includes('<ul>')) {
+        elem = elem.substr(elem.indexOf('<ul>') + 4)
+        // console.log('found!')
+      };
 
       // if (elem.includes('<li class="pager-')) {
       //   elem = ReactHtmlParser(elem)
@@ -115,7 +159,7 @@ class App extends Component {
     })
 
     // let doc = new DOMParser().parseFromString('<div><b>Hello!</b></div>', 'text/html');
-    this.setState({ result2: array5 });
+    this.setState({ result2: array5, pagesTotal: pagesTotal.length });
   }
 
   render() {
@@ -138,6 +182,11 @@ class App extends Component {
         </div>
         <div>
           <input type="checkbox" name="genre" value="newsletter" onChange={this.handleChecked} checked={this.state.genreChecked} /><label>Жанры</label>
+        </div>
+        <div className='Pages'>
+          <button className='Button' onClick={() => this.changePageNumber(1)}>Предыдущая</button>
+          <p className='Button'>Страница {this.state.pageNumber+1}</p>
+          <button className='Button' onClick={() => this.changePageNumber(2)}>Следующая</button>
         </div>
         <div>
           {this.state.result2.map((result, index) => {
