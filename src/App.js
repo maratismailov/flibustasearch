@@ -42,6 +42,7 @@ class App extends Component {
     };
     this.handleChange = this.handleChange.bind(this);
     this.handleSearch = this.handleSearch.bind(this);
+    this.handleNewSearch = this.handleNewSearch.bind(this);
     this.handleChecked = this.handleChecked.bind(this);
     // this.changePageNumber = this.changePageNumber.bind(this)
   }
@@ -104,6 +105,10 @@ class App extends Component {
     axios.get(searchQuerie).then(response => {
       this.setState({ result: response.data }, () => this.refineResult());
     });
+  }
+
+  handleNewSearch() {
+    this.setState({ pageNumber: 0 }, () => this.handleSearch());
   }
 
   refineResult() {
@@ -177,13 +182,20 @@ class App extends Component {
         elem = elem.substr(elem.indexOf("<ul>") + 4);
         // console.log('found!')
       }
-      elem = elem.replace(
-        '<span style="background-color: #FFFCBB"></span>',
-        ""
-      );
+      elem = elem.replace(/<span style="background-color: #FFFCBB">/g, "");
+      elem = elem.replace(/<\/span>/g, "");
       elem = elem.replace("<b>", "");
       elem = elem.replace("</b>", "");
-      elem = elem.replace(/<a href="\//g, "<a href=\"http://flibusta.is/");
+      elem = elem.replace(/<a href="\//g, '<a href="http://flibusta.is/');
+
+      if (elem.includes('flibusta.is/b')) {
+        // elem = elem + elem.replace(elem.indexOf('/b/')+3, (elem.indexOf('/b/')+3)+'/fb2')
+
+        elem = elem + elem.substring(elem.indexOf('<a href'), elem.indexOf('\">')) + '/fb2\">fb2</a>'
+
+
+        // + <a href="http://flibusta.is/b/530436/fb2">fb2</a>)
+      }
 
       // if (elem.includes('<li class="pager-')) {
       //   elem = ReactHtmlParser(elem)
@@ -227,7 +239,7 @@ class App extends Component {
 
         {/* <SearchInput
           placeholder='Enter book name' /> */}
-        <button onClick={this.handleSearch}>Search</button>
+        <button onClick={this.handleNewSearch}>Search</button>
         <div>
           <input
             type="checkbox"
