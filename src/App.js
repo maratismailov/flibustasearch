@@ -188,11 +188,17 @@ class App extends Component {
       elem = elem.replace("</b>", "");
       elem = elem.replace(/<a href="\//g, '<a href="http://flibusta.is/');
 
-      if (elem.includes('flibusta.is/b')) {
+      if (elem.includes("flibusta.is/b")) {
         // elem = elem + elem.replace(elem.indexOf('/b/')+3, (elem.indexOf('/b/')+3)+'/fb2')
 
-        elem = elem + elem.substring(elem.indexOf('<a href'), elem.indexOf('\">')) + '/fb2\">fb2</a>'
-
+        elem =
+          elem +
+          elem.substring(elem.indexOf("<a href"), elem.indexOf('">')) +
+          '/fb2">fb2 </a>' +
+          elem.substring(elem.indexOf("<a href"), elem.indexOf('">')) +
+          '/epub">epub </a>' +
+          elem.substring(elem.indexOf("<a href"), elem.indexOf('">')) +
+          '/mobi">mobi</a>';
 
         // + <a href="http://flibusta.is/b/530436/fb2">fb2</a>)
       }
