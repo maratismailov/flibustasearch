@@ -85,18 +85,19 @@ class App extends Component {
     // this.setState({ search: this.state.value });
     // &chs=on
     let preQuerie = this.state.querie.replace(/ /g, "+");
-    if (this.state.seriesChecked) {
-      preQuerie = preQuerie + "&chs=on";
-    }
-    if (this.state.authorChecked) {
-      preQuerie = preQuerie + "&cha=on";
-    }
-    if (this.state.bookChecked) {
-      preQuerie = preQuerie + "&chb=on";
-    }
+    // if (this.state.seriesChecked) {
+    //   preQuerie = preQuerie + "&chs=on";
+    // }
+    // if (this.state.authorChecked) {
+    //   preQuerie = preQuerie + "&cha=on";
+    // }
+    // if (this.state.bookChecked) {
+    //   preQuerie = preQuerie + "&chb=on";
+    // }
     // if (this.state.genreChecked) {
     //   preQuerie = preQuerie + '&chg=on'
     // }
+      preQuerie = preQuerie + "&chb=on";
     const searchQuerie =
       "https://flibustasearch.herokuapp.com/http://flibusta.is/booksearch?page=" +
       this.state.pageNumber +
@@ -246,7 +247,7 @@ class App extends Component {
         {/* <SearchInput
           placeholder='Enter book name' /> */}
         <button onClick={this.handleNewSearch}>Search</button>
-        <div>
+        {/* <div>
           <input
             type="checkbox"
             name="series"
@@ -285,7 +286,7 @@ class App extends Component {
             checked={this.state.genreChecked}
           />
           <label>Жанры</label>
-        </div>
+        </div> */}
         <div className="Pages">
           <button
             className={prevButton}
